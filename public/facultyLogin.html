@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discipline Forum</title>
+    <style>
+        /* Reset default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            background-image: url('stPauls.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        header {
+            background-color: rgba(158, 28, 63, 0.9); /* Adding opacity to background color */
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 2rem;
+        }
+
+        section {
+            margin: 4rem 0;
+            background-color: rgba(255, 255, 255, 0.8); /* White background with opacity */
+            padding: 2rem;
+            border-radius: 8px;
+            border: 2px solid rgba(0, 0, 0, 0.3); /* Translucent border */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+        }
+
+        input, button {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #9a2c2c;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+        }
+
+        button:hover {
+            background-color: #c02424;
+        }
+
+        footer {
+            background-color: rgba(158, 28, 63, 0.9);
+            color: #fff;
+            text-align: center;
+            padding: 0.6rem 0;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+        }
+
+        h2 {
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Discipline Forum</h1>
+</header>
+
+<main>
+    <section id="login-form">
+        <h2>LogIn</h2>
+        <form id="login-form" onsubmit="login(event)">
+            <label for="username"></label>
+            <input type="text" id="username" placeholder="Username" name="username" required>
+            <label for="password"></label>
+            <input type="password" id="password" placeholder="Password" name="password" required>
+            <button type="submit">Login</button>
+            <p id="login-error" style="color: red; display: none;">Incorrect username or password.</p>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 Sathyabama Institute of Science and Technology</p>
+</footer>
+
+<script>
+    // Check login status on page load
+    window.onload = function() {
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            window.location.href = '/issueForm.html';
+        }
+    };
+
+    function login(event) {
+        event.preventDefault(); // Prevent the form from submitting the default way
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Set session storage to indicate logged-in status
+                    sessionStorage.setItem('loggedIn', 'true');
+                    // Navigate to issueForm.html and force reload
+                    window.location.href = '/issueForm.html';
+                } else {
+                    // Display an error message if login fails
+                    document.getElementById('login-error').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('login-error').style.display = 'block';
+            });
+    }
+
+    // Refresh page when hit back
+    window.addEventListener("pageshow", function (event) {
+        var historyTraversal = event.persisted,
+            perf = window.performance,
+            perfEntries =
+                perf && perf.getEntriesByType && perf.getEntriesByType("navigation"),
+            perfEntryType = perfEntries && perfEntries[0] && perfEntries[0].type,
+            navigationType = perf && perf.navigation && perf.navigation.type;
+        if (
+            historyTraversal ||
+            perfEntryType === "back_forward" ||
+            navigationType === 2
+        ) {
+            // Handle page restore.
+            window.location.reload();
+        }
+    });
+</script>
+</body>
+</html>
