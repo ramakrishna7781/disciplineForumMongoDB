@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const mysql = require('mysql'); // or any other database client library
+const { MongoClient } = require('mongodb'); // MongoDB client
 
 const app = express();
 const port = 8000;
@@ -17,46 +17,49 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'facultyLogin.html'));
 });
 
-// Database connection
-const db = mysql.createConnection({
-    host: 'localhost', // replace with your database host
-    user: 'root', // replace with your database username
-    password: 'mySQLdb@0308!', // replace with your database password
-    database: 'discipline_forum' // replace with your database name
-});
+// MongoDB connection URI
+const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/facultyLoginDB?retryWrites=true&w=majority';
 
-// Connect to the database
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
+// Connect to MongoDB
+const client = new MongoClient(uri);
+
+async function run() {
+    try {
+        // Connect the client to the server
+        await client.connect();
+        console.log('Connected to MongoDB');
+
+        const db = client.db('facultyLoginDB');
+        const usersCollection = db.collection('facultyLoginCollection');
+
+        // Route to handle login
+        app.post('/login', async (req, res) => {
+            const { username, password } = req.body;
+
+            try {
+                // Query to check if the username and password are correct
+                const user = await usersCollection.findOne({ username, password });
+
+                if (user) {
+                    // If a match is found, login is successful
+                    res.json({ success: true });
+                } else {
+                    // If no match is found, login fails
+                    res.json({ success: false });
+                }
+            } catch (error) {
+                console.error('Error querying the database:', error);
+                res.status(500).json({ success: false });
+            }
+        });
+
+        // Start the server
+        app.listen(port, () => {
+            console.log(`Server running at http://10.128.12.7:${port}/`);
+        });
+    } catch (err) {
+        console.error('Error connecting to MongoDB:', err);
     }
-    console.log('Connected to the database');
-});
+}
 
-// Route to handle login
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Query to check if the username and password are correct
-    const query = 'SELECT * FROM users WHERE username = ? AND password = ?';
-    db.query(query, [username, password], (error, results) => {
-        if (error) {
-            console.error('Error querying the database:', error);
-            return res.status(500).json({ success: false });
-        }
-
-        if (results.length > 0) {
-            // If a match is found, login is successful
-            res.json({ success: true });
-        } else {
-            // If no match is found, login fails
-            res.json({ success: false });
-        }
-    });
-});
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://10.128.12.230:${port}/`);
-});
+run().catch(console.dir);
