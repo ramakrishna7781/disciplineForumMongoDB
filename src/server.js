@@ -30,6 +30,7 @@ async function run() {
 
         const db = client.db('facultyLoginDB');
         const usersCollection = db.collection('facultyLoginCollection');
+        const stdCollection = db.collection('studentInfoCollection');
 
         // Route to handle login
         app.post('/login', async (req, res) => {
@@ -54,7 +55,7 @@ async function run() {
             const { regNO } = req.body;
 
             try {
-                const student = await usersCollection.findOne({ regNO });
+                const student = await stdCollection.findOne({ regNO });
 
                 if (student) {
                     res.json({ success: true, student });
