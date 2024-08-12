@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Issue Form</title>
     <style>
+        /* Your original CSS remains unchanged */
         /* Reset default browser styles */
         * {
             margin: 0;
@@ -31,6 +32,9 @@
             color: #fff;
             padding: 1rem;
             text-align: center;
+            width: 100%; /* Ensure header spans the full width */
+            position: relative;
+            top: 0; /* Keep the header at the top */
         }
 
         main {
@@ -102,6 +106,14 @@
             position: relative;
             bottom: 0;
         }
+
+        #student-details {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -111,10 +123,11 @@
 
 <main>
     <section id="register-form">
-        <form id="register-form">
+        <form id="register-form" onsubmit="fetchStudent(event)">
             <input type="text" id="student-register" name="student-register" placeholder="Register Number" pattern="\d*" title="Please enter numbers only" required>
             <button type="submit">Verify</button>
         </form>
+        <div id="student-details"></div>
     </section>
     <button id="logout-button" onclick="logout()">Logout</button>
 </main>
@@ -124,7 +137,6 @@
 </footer>
 
 <script>
-    // Check login status on page load
     window.onload = function() {
         if (sessionStorage.getItem('loggedIn') !== 'true') {
             window.location.href = '/facultyLogin.html';
@@ -136,20 +148,40 @@
         window.location.href = '/facultyLogin.html';
     }
 
-    //refresh page when hit back
+    function fetchStudent(event) {
+        event.preventDefault();
+        const regNO = document.getElementById('student-register').value;
+
+        fetch('/fetchStudent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ regNO })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const student = data.student;
+                    document.getElementById('student-details').innerHTML = `
+                    <p><strong>Name:</strong> ${student.name}</p>
+                    <p><strong>Section:</strong> ${student.section}</p>
+                    <p><strong>Coordinator:</strong> ${student.coordinator}</p>
+                    <p><strong>Indiscipline:</strong> ${student.indiscipline}</p>
+                    <p><strong>Number of Times:</strong> ${student.noofTimes}</p>
+                `;
+                } else {
+                    document.getElementById('student-details').innerHTML = `<p style="color: red;">No student found with this register number.</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('student-details').innerHTML = `<p style="color: red;">Error fetching student details.</p>`;
+            });
+    }
+
     window.addEventListener("pageshow", function (event) {
-        var historyTraversal = event.persisted,
-            perf = window.performance,
-            perfEntries =
-                perf && perf.getEntriesByType && perf.getEntriesByType("navigation"),
-            perfEntryType = perfEntries && perfEntries[0] && perfEntries[0].type,
-            navigationType = perf && perf.navigation && perf.navigation.type;
-        if (
-            historyTraversal ||
-            perfEntryType === "back_forward" ||
-            navigationType === 2
-        ) {
-            // Handle page restore.
+        if (event.persisted || window.performance.navigation.type === 2) {
             window.location.reload();
         }
     });

@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { MongoClient } = require('mongodb'); // MongoDB client
+const { MongoClient } = require('mongodb');
 
 const app = express();
 const port = 8000;
@@ -18,14 +18,13 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection URI
-const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/facultyLoginDB?retryWrites=true&w=majority';
+const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/facultyLoginDB?retryWrites=true&w=majority'; // Replace this with your actual MongoDB URI
 
 // Connect to MongoDB
 const client = new MongoClient(uri);
 
 async function run() {
     try {
-        // Connect the client to the server
         await client.connect();
         console.log('Connected to MongoDB');
 
@@ -37,14 +36,11 @@ async function run() {
             const { username, password } = req.body;
 
             try {
-                // Query to check if the username and password are correct
                 const user = await usersCollection.findOne({ username, password });
 
                 if (user) {
-                    // If a match is found, login is successful
                     res.json({ success: true });
                 } else {
-                    // If no match is found, login fails
                     res.json({ success: false });
                 }
             } catch (error) {
@@ -53,9 +49,26 @@ async function run() {
             }
         });
 
-        // Start the server
+        // Route to handle fetching student details
+        app.post('/fetchStudent', async (req, res) => {
+            const { regNO } = req.body;
+
+            try {
+                const student = await usersCollection.findOne({ regNO });
+
+                if (student) {
+                    res.json({ success: true, student });
+                } else {
+                    res.json({ success: false });
+                }
+            } catch (error) {
+                console.error('Error fetching student details:', error);
+                res.status(500).json({ success: false });
+            }
+        });
+
         app.listen(port, () => {
-            console.log(`Server running at http://10.128.12.7:${port}/`);
+            console.log(`Server running at http://localhost:${port}/`);
         });
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);
