@@ -125,13 +125,15 @@
         }
 
         .submit-button {
-            margin-top: 1rem; /* Space between dropdown and button */
+            display: block; /* Makes the button take up the full width of its parent */
+            margin: 0 auto; /* Centers the button horizontally */
+            padding: 0.5rem 1rem;
             background-color: #9a2c2c;
             color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
             cursor: pointer;
-            font-size: 1rem;
+            text-align: center;
+            margin-top: 20px;
         }
 
         .submit-button:hover {
@@ -196,7 +198,7 @@
                         <option value="idCard">ID Card</option>
                         <option value="shoes">Shoes</option>
                     </select>
-                    <button type="button" class="submit-button" onclick="submitIssue()">Submit Issue</button>
+                    <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
                 `;
                 } else {
                     document.getElementById('student-details').innerHTML = `<p style="color: red;">No student found with this register number.</p>`;
