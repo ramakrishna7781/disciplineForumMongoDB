@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Issue Form</title>
+    <title>Issue Form</title>
     <style>
         /* Your original CSS remains unchanged */
         /* Reset default browser styles */
@@ -52,6 +52,9 @@
             padding: 2rem;
             border-radius: 8px;
             border: 2px solid rgba(0, 0, 0, 0.3); /* Translucent border */
+            width: 300px; /* Fixed width */
+            max-height: 600px; /* Fixed max height */
+            overflow-y: auto; /* Add scroll if content overflows */
         }
 
         form {
@@ -206,9 +209,28 @@
     }
 
     function submitIssue() {
+        const regNO = document.getElementById('student-register').value;
         const issue = document.getElementById('issues').value;
-        // Add your logic to handle the issue submission
-        console.log('Issue submitted:', issue);
+
+        fetch('/updateIssue', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ regNO, issue })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Issue updated successfully');
+                } else {
+                    alert('Error updating issue');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating issue');
+            });
     }
 
     window.addEventListener("pageshow", function (event) {
