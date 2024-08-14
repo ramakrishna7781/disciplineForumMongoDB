@@ -31,6 +31,7 @@ async function run() {
         const db = client.db('facultyLoginDB');
         const usersCollection = db.collection('facultyLoginCollection');
         const stdCollection = db.collection('studentInfoCollection');
+        const coordCollection = db.collection('disciplineIssuesCollection'); // Collection for coordinators
 
         // Route to handle login
         app.post('/login', async (req, res) => {
@@ -68,11 +69,54 @@ async function run() {
             }
         });
 
-        app.listen(port, () => {
-            console.log(`Server running at http://localhost:${port}/`);
+        // Route to handle updating the issue
+        app.post('/updateIssue', async (req, res) => {
+            const { regNO, issue } = req.body;
+
+            try {
+                const student = await stdCollection.findOne({ regNO });
+
+                if (student) {
+                    const { name, section, coordinator } = student;
+
+                    // Determine which coordinator's document to update
+                    const coordinatorDoc = await coordCollection.findOne({ name: coordinator });
+
+                    if (coordinatorDoc) {
+                        // Create the student issue object
+                        const studentIssue = {
+                            regNO,
+                            name,
+                            section,
+                            issue,
+                            dateReported: new Date(),
+                        };
+
+                        // Add the student's issue to the coordinator's document
+                        await coordCollection.updateOne(
+                            { name: coordinator },
+                            { $push: { studentIssues: studentIssue } }
+                        );
+
+                        res.json({ success: true });
+                    } else {
+                        res.status(404).json({ success: false, message: 'Coordinator not found' });
+                    }
+                } else {
+                    res.status(404).json({ success: false, message: 'Student not found' });
+                }
+            } catch (error) {
+                console.error('Error updating issue:', error);
+                res.status(500).json({ success: false });
+            }
         });
-    } catch (err) {
-        console.error('Error connecting to MongoDB:', err);
+
+        // Start the server
+        app.listen(port, () => {
+            console.log(`Server running at http://10.128.13.217:${port}/`);
+        });
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
     }
 }
 
