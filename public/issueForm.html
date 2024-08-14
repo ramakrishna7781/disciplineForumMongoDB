@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Issue Form</title>
     <style>
-        /* Your original CSS remains unchanged */
         /* Reset default browser styles */
         * {
             margin: 0;
@@ -192,7 +191,7 @@
                 <p><strong>Name:</strong> ${student.name}</p>
                 <p><strong>Section:</strong> ${student.section}</p>
                 <p><strong>Coordinator:</strong> ${student.coordinator}</p>
-                <select id="issues">
+                <select id="issues" required >
                     <option value="" disabled selected>--select issue--</option>
                     <option value="dressCode">Dress Code</option>
                     <option value="idCard">ID Card</option>
@@ -214,6 +213,11 @@
         const regNO = document.getElementById('student-register').value;
         const issue = document.getElementById('issues').value;
 
+        if (!issue) { // Ensure issue is selected
+            alert('Please select an issue before submitting.');
+            return;
+        }
+
         fetch('/updateIssue', {
             method: 'POST',
             headers: {
@@ -225,6 +229,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Issue updated successfully');
+                    window.location.reload(); // Refresh the page after successful submission
                 } else {
                     alert('Error updating issue');
                 }
