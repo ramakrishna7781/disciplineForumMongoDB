@@ -189,17 +189,17 @@
                 if (data.success) {
                     const student = data.student;
                     document.getElementById('student-details').innerHTML = `
-                    <p><strong>Name:</strong> ${student.name}</p>
-                    <p><strong>Section:</strong> ${student.section}</p>
-                    <p><strong>Coordinator:</strong> ${student.coordinator}</p>
-                    <select id="issues">
-                        <option value="" disabled selected>--select issue--</option>
-                        <option value="dressCode">Dress Code</option>
-                        <option value="idCard">ID Card</option>
-                        <option value="shoes">Shoes</option>
-                    </select>
-                    <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
-                `;
+                <p><strong>Name:</strong> ${student.name}</p>
+                <p><strong>Section:</strong> ${student.section}</p>
+                <p><strong>Coordinator:</strong> ${student.coordinator}</p>
+                <select id="issues">
+                    <option value="" disabled selected>--select issue--</option>
+                    <option value="dressCode">Dress Code</option>
+                    <option value="idCard">ID Card</option>
+                    <option value="shoes">Shoes</option>
+                </select>
+                <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
+            `;
                 } else {
                     document.getElementById('student-details').innerHTML = `<p style="color: red;">No student found with this register number.</p>`;
                 }
@@ -213,11 +213,6 @@
     function submitIssue() {
         const regNO = document.getElementById('student-register').value;
         const issue = document.getElementById('issues').value;
-
-        if (!issue) {
-            alert('Please select an issue');
-            return; // Stop the function if no issue is selected
-        }
 
         fetch('/updateIssue', {
             method: 'POST',
@@ -237,9 +232,6 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error updating issue');
-            })
-            .finally(() => {
-                window.location.reload(); // Refresh the page after the alert
             });
     }
 
