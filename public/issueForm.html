@@ -196,6 +196,19 @@
         #close-success-popup:hover {
             background-color: #c02424;
         }
+
+        #close-send-email-popup {
+            background-color: #9a2c2c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        #close-send-email-popup:hover {
+            background-color: #c02424;
+        }
     </style>
 </head>
 <body>
@@ -235,6 +248,14 @@
     </div>
 </div>
 
+<!-- New Pop-up for Send Emails -->
+<div id="send-email-popup" class="popup">
+    <div class="popup-content" id="send-email-popup-content">
+        <p id="send-email-popup-message"></p>
+        <button id="close-send-email-popup">OK</button>
+    </div>
+</div>
+
 <script>
     window.onload = function() {
         if (sessionStorage.getItem('loggedIn') !== 'true') {
@@ -262,31 +283,28 @@
             .then(data => {
                 if (data.success) {
                     const student = data.student;
-                    document.getElementById('student-details').innerHTML = `
+                    document.getElementById('student-details').innerHTML = ` 
                     <p><strong>Name:</strong> ${student.name}</p>
                     <p><strong>Section:</strong> ${student.section}</p>
                     <p><strong>Coordinator:</strong> ${student.coordinator}</p>
                     <select id="issues">
                         <option value="" disabled selected>--select issue--</option>
-                        <option value="dressCode">Dress Code</option>
-                        <option value="idCard">ID Card</option>
-                        <option value="shoes">Shoes</option>
-                        <option value="badHairstyle">Bad Hairstyle</option>
-                        <option value="noNotebook">No Notebook</option>
-                        <option value="lateFifteen">Late by 15 min</option>
-                        <option value="lateThirty">Late by 30 min</option>
+                        <option value="Improper Dress Code">Improper Dress Code</option>
+                        <option value="No ID Card">No ID Card</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Bad Hairstyle">Bad Hairstyle</option>
+                        <option value="No Notebook">No Notebook</option>
+                        <option value="Late by 15 min">Late by 15 min</option>
+                        <option value="Late by 30 min">Late by 30 min</option>
                         <option value="Class Bunk">Class Bunk</option>
                     </select>
                     <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
                 `;
                 } else {
-                    document.getElementById('student-details').innerHTML = `<p style="color: red;">No student found with this register number.</p>`;
+                    alert('Student not found');
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('student-details').innerHTML = `<p style="color: red;">Error fetching student details.</p>`;
-            });
+            .catch(error => console.error('Error:', error));
     }
 
     function submitIssue() {
@@ -295,7 +313,7 @@
 
         if (!issue) {
             document.getElementById('custom-popup').style.display = 'block';
-            return; // Stop the function if no issue is selected
+            return;
         }
 
         fetch('/updateIssue', {
@@ -326,26 +344,37 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Emails sent successfully!');
+                    document.getElementById('send-email-popup-message').innerText = 'Emails sent successfully!';
+                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('success');
+                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('error');
+                    document.getElementById('send-email-popup').style.display = 'block';
                 } else {
-                    alert('Error sending emails.');
+                    document.getElementById('send-email-popup-message').innerText = 'Error sending emails!!';
+                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('error');
+                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('success');
+                    document.getElementById('send-email-popup').style.display = 'block';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error sending emails.');
+                document.getElementById('send-email-popup-message').innerText = 'Error sending emails!!';
+                document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('error');
+                document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('success');
+                document.getElementById('send-email-popup').style.display = 'block';
             });
     }
 
-    // Event listener for closing the custom pop-ups
     document.getElementById('close-popup').addEventListener('click', function() {
         document.getElementById('custom-popup').style.display = 'none';
     });
 
     document.getElementById('close-success-popup').addEventListener('click', function() {
         document.getElementById('success-popup').style.display = 'none';
-        // Refresh the page after closing the success popup
         window.location.reload();
+    });
+
+    document.getElementById('close-send-email-popup').addEventListener('click', function() {
+        document.getElementById('send-email-popup').style.display = 'none';
     });
 </script>
 </body>
