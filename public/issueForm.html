@@ -20,7 +20,7 @@
             display: flex;
             flex-direction: column;
             font-family: Arial, sans-serif;
-            background-image: url('stPauls.jpg');
+            background-image: url('adminBlock.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -200,7 +200,7 @@
 </head>
 <body>
 <header>
-    <h1>Discipline Forum</h1>
+    <h1>CSE Discipline Forum</h1>
 </header>
 
 <main>
@@ -210,6 +210,8 @@
             <button type="submit">Verify</button>
         </form>
         <div id="student-details"></div>
+        <!-- New Send Emails Button -->
+        <button id="send-emails" class="submit-button" onclick="sendEmails()">Send Emails</button>
     </section>
     <button id="logout-button" onclick="logout()">Logout</button>
 </main>
@@ -269,6 +271,10 @@
                         <option value="dressCode">Dress Code</option>
                         <option value="idCard">ID Card</option>
                         <option value="shoes">Shoes</option>
+                        <option value="badHairstyle">Bad Hairstyle</option>
+                        <option value="noNotebook">No Notebook</option>
+                        <option value="lateFifteen">Late by 15 min</option>
+                        <option value="lateThirty">Late by 30 min</option>
                     </select>
                     <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
                 `;
@@ -309,6 +315,24 @@
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('custom-popup').style.display = 'block';
+            });
+    }
+
+    function sendEmails() {
+        fetch('/sendEmails', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Emails sent successfully!');
+                } else {
+                    alert('Error sending emails.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending emails.');
             });
     }
 

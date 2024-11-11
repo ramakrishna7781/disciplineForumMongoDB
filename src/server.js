@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = 8000;
@@ -31,7 +32,8 @@ async function run() {
         const db = client.db('facultyLoginDB');
         const usersCollection = db.collection('facultyLoginCollection');
         const stdCollection = db.collection('studentInfoCollection');
-        const coordCollection = db.collection('disciplineIssuesCollection'); // Collection for coordinators
+        const coordCollection = db.collection('disciplineIssuesCollection');
+        const mailsCollection = db.collection('mailsCollection'); // Collection for coordinator emails
 
         // Route to handle login
         app.post('/login', async (req, res) => {
@@ -111,9 +113,64 @@ async function run() {
             }
         });
 
+        // Route to handle sending emails
+        app.post('/sendEmails', async (req, res) => {
+            try {
+                const coordinators = await coordCollection.find({ 'studentIssues.0': { $exists: true } }).toArray();
+
+                if (coordinators.length === 0) {
+                    return res.json({ success: false, message: 'No issues to send.' });
+                }
+
+                const mailList = await mailsCollection.find().toArray();
+                const emailMap = mailList.reduce((map, item) => {
+                    map[item.section] = item.email;
+                    return map;
+                }, {});
+
+                // Create a transporter object using SMTP transport
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail', // Replace with your email service
+                    auth: {
+                        user: 'ramakrishnark1716@gmail.com', // Replace with your email
+                        pass: 'dnjv ymaw xtss uhrc', // Replace with your email password
+                    },
+                });
+
+                for (const coord of coordinators) {
+                    const { name, section, studentIssues } = coord;
+                    const email = emailMap[section];
+
+                    if (!email) {
+                        console.error(`No email found for section ${section}`);
+                        continue;
+                    }
+
+                    // Send email
+                    await transporter.sendMail({
+                        from: 'ramakrishnark1716@gmail.com',
+                        to: email,
+                        subject: `Student Issues for ${section}`,
+                        text: `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`,
+                    });
+
+                    //Clear the issues after sending email
+                    await coordCollection.updateOne(
+                        { name },
+                        { $set: { studentIssues: [] } }
+                    );
+                }
+
+                res.json({ success: true });
+            } catch (error) {
+                console.error('Error sending emails:', error);
+                res.status(500).json({ success: false });
+            }
+        });
+
         // Start the server
         app.listen(port, () => {
-            console.log(`Server running at http://192.168.153.234:${port}/`);
+            console.log(`Server running at http://localhost:${port}/`);
         });
     } catch (error) {
         console.error('Error connecting to MongoDB:', error);
