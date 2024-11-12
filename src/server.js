@@ -151,7 +151,7 @@ async function run() {
                         from: 'ramakrishnark1716@gmail.com',
                         to: email,
                         subject: `Student Issues for ${section}`,
-                        text: `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`,
+                        text: `Dear ${name},\n\nThe following discipline issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nCSE Discipline Forum`,
                     });
 
                     //Clear the issues after sending email
