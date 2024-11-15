@@ -79,31 +79,30 @@ async function run() {
                 const student = await stdCollection.findOne({ regNO });
 
                 if (student) {
-                    const { name, section, coordinator } = student;
+                    const { name, section } = student;
 
-                    // Determine which coordinator's document to update
-                    const coordinatorDoc = await coordCollection.findOne({ name: coordinator });
+                    // Create the student issue object
+                    const studentIssue = {
+                        regNO,
+                        name,
+                        section,
+                        issue,
+                        dateReported: new Date(),
+                    };
 
-                    if (coordinatorDoc) {
-                        // Create the student issue object
-                        const studentIssue = {
-                            regNO,
-                            name,
-                            section,
-                            issue,
-                            dateReported: new Date(),
-                        };
+                    // Update the coordinator's document
+                    await coordCollection.updateOne(
+                        { section },
+                        { $push: { studentIssues: studentIssue } }
+                    );
 
-                        // Add the student's issue to the coordinator's document
-                        await coordCollection.updateOne(
-                            { name: coordinator },
-                            { $push: { studentIssues: studentIssue } }
-                        );
+                    // Update the HOD's document
+                    await coordCollection.updateOne(
+                        { name: 'HOD' },
+                        { $push: { studentIssues: studentIssue } }
+                    );
 
-                        res.json({ success: true });
-                    } else {
-                        res.status(404).json({ success: false, message: 'Coordinator not found' });
-                    }
+                    res.json({ success: true });
                 } else {
                     res.status(404).json({ success: false, message: 'Student not found' });
                 }
@@ -139,8 +138,19 @@ async function run() {
 
                 for (const coord of coordinators) {
                     const { name, section, studentIssues } = coord;
-                    const email = emailMap[section];
 
+                    // Determine email content
+                    let subject, text;
+                    if (name === 'HOD') {
+                        subject = 'Student Issues';
+                        text = `Dear ${name},\n\nThe following issues have been reported today:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nSection: ${issue.section}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
+                    } else {
+                        subject = `Student Issues for ${section}`;
+                        text = `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
+                    }
+
+                    // Determine recipient email
+                    const email = emailMap[section];
                     if (!email) {
                         console.error(`No email found for section ${section}`);
                         continue;
@@ -150,11 +160,11 @@ async function run() {
                     await transporter.sendMail({
                         from: 'ramakrishnark1716@gmail.com',
                         to: email,
-                        subject: `Student Issues for ${section}`,
-                        text: `Dear ${name},\n\nThe following discipline issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nCSE Discipline Forum`,
+                        subject,
+                        text,
                     });
 
-                    //Clear the issues after sending email
+                    // Clear the issues after sending the email
                     await coordCollection.updateOne(
                         { name },
                         { $set: { studentIssues: [] } }
