@@ -87,7 +87,7 @@ async function run() {
                         name,
                         section,
                         issue,
-                        dateReported: new Date(),
+                        dateReported: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), // IST date and time,
                     };
 
                     // Update the coordinator's document
