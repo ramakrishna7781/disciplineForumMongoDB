@@ -98,7 +98,7 @@ async function run() {
 
                     // Update the HOD's document
                     await coordCollection.updateOne(
-                        { name: 'HOD' },
+                        { name: 'Lakshmanan L' },
                         { $push: { studentIssues: studentIssue } }
                     );
 
@@ -141,11 +141,11 @@ async function run() {
 
                     // Determine email content
                     let subject, text;
-                    if (name === 'HOD') {
-                        subject = 'Student Issues';
+                    if (name === 'Lakshmanan L') {
+                        subject = 'CSE Discipline Forum Sathyabama';
                         text = `Dear ${name},\n\nThe following issues have been reported today:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nSection: ${issue.section}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
                     } else {
-                        subject = `Student Issues for ${section}`;
+                        subject = `CSE Discipline Forum Sathyabama\nStudent Issues for ${section}`;
                         text = `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
                     }
 
