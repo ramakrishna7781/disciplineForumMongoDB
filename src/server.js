@@ -166,9 +166,15 @@ async function run() {
 
                     // Clear the issues after sending the email
                     await coordCollection.updateOne(
-                        { name },
+                        {
+                            $or: [
+                                { name },
+                                { section },
+                            ],
+                        },
                         { $set: { studentIssues: [] } }
                     );
+                    
                 }
 
                 res.json({ success: true });
