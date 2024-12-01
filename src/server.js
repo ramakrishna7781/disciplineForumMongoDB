@@ -3,6 +3,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 const nodemailer = require('nodemailer');
+const ExcelJS = require('exceljs');
+
 
 const app = express();
 const port = 8000;
@@ -127,7 +129,6 @@ async function run() {
                     return map;
                 }, {});
 
-                // Create a transporter object using SMTP transport
                 const transporter = nodemailer.createTransport({
                     service: 'gmail', // Replace with your email service
                     auth: {
@@ -139,18 +140,47 @@ async function run() {
                 for (const coord of coordinators) {
                     const { name, section, studentIssues } = coord;
 
-                    // Determine email content
-                    let subject, text;
+                    let email, subject, text, attachments;
+
                     if (name === 'Lakshmanan L') {
                         subject = 'CSE Discipline Forum Sathyabama';
-                        text = `Dear ${name},\n\nThe following issues have been reported today:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nSection: ${issue.section}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
+                        text = `Dear ${name},\n\nPlease find attached the student issues reported today.\n\nBest regards,\nCSE Discipline Forum`;
+
+                        // Generate Excel file
+                        const workbook = new ExcelJS.Workbook();
+                        const worksheet = workbook.addWorksheet('Student Issues');
+
+                        // Add headers
+                        worksheet.columns = [
+                            { header: 'Register Number', key: 'regNO', width: 20 },
+                            { header: 'Name', key: 'name', width: 25 },
+                            { header: 'Section', key: 'section', width: 15 },
+                            { header: 'Issue', key: 'issue', width: 50 },
+                            { header: 'Date Reported', key: 'dateReported', width: 25 },
+                        ];
+
+                        // Add data
+                        studentIssues.forEach(issue => worksheet.addRow(issue));
+
+                        // Write to buffer
+                        const buffer = await workbook.xlsx.writeBuffer();
+
+                        // Attach Excel file
+                        attachments = [
+                            {
+                                filename: `Student_Issues_${new Date().toISOString().slice(0, 10)}.xlsx`,
+                                content: buffer,
+                            },
+                        ];
+
+                        email = emailMap[section];
                     } else {
                         subject = `CSE Discipline Forum Sathyabama\nStudent Issues for ${section}`;
-                        text = `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nDiscipline Forum`;
+                        text = `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nCSE Discipline Forum`;
+                        attachments = [];
+                        email = emailMap[section];
                     }
 
-                    // Determine recipient email
-                    const email = emailMap[section];
                     if (!email) {
                         console.error(`No email found for section ${section}`);
                         continue;
@@ -162,6 +192,7 @@ async function run() {
                         to: email,
                         subject,
                         text,
+                        attachments,
                     });
 
                     // Clear the issues after sending the email
@@ -174,7 +205,6 @@ async function run() {
                         },
                         { $set: { studentIssues: [] } }
                     );
-                    
                 }
 
                 res.json({ success: true });
@@ -183,6 +213,7 @@ async function run() {
                 res.status(500).json({ success: false });
             }
         });
+
 
         // Start the server
         app.listen(port, () => {
