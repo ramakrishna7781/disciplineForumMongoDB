@@ -22,7 +22,6 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection URI
-//const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/';
 const uri = process.env.MONGO_URI;
 
 // Connect to MongoDB
@@ -148,8 +147,8 @@ async function run() {
                 const transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'ramakrishnark1716@gmail.com',
-                        pass: 'dnjv ymaw xtss uhrc',
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS //'dnjv ymaw xtss uhrc',
                     },
                 });
 
@@ -195,7 +194,7 @@ async function run() {
 
                     // Send email
                     await transporter.sendMail({
-                        from: 'ramakrishnark1716@gmail.com',
+                        from: process.env.EMAIL_USER,
                         to: email,
                         subject,
                         text,
