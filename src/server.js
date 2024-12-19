@@ -133,9 +133,9 @@ async function run() {
 
         // Schedule email sending at 10:00 AM Monday to Saturday
         //cron.schedule('0 10 * * 1-6', async () => {
-        cron.schedule('40 2 * * 1-6', async () => {
-            const currentTime = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
-            console.log(`Cron job triggered at ${currentTime} IST`);
+        cron.schedule('3 11 * * 1-6', async () => {
+            const currentTime = moment().tz('Africa/Abidjan').format('YYYY-MM-DD HH:mm:ss');
+            console.log(`Cron job triggered at ${currentTime} GMT`);
             try {
                 console.log('Running scheduled email task...');
 
