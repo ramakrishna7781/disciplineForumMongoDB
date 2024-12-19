@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 const nodemailer = require('nodemailer');
 const ExcelJS = require('exceljs');
-
 const cron = require('node-cron');
 
 
@@ -23,7 +22,8 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection URI
-const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/'; // Replace this with your actual MongoDB URI
+//const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/';
+const uri = process.env.MONGO_URI;
 
 // Connect to MongoDB
 const client = new MongoClient(uri);
