@@ -7,12 +7,6 @@ const ExcelJS = require('exceljs');
 const cron = require('node-cron');
 const moment = require("moment-timezone");
 
-
-console.log("Current server time:", moment().format('YYYY-MM-DD HH:mm:ss'));
-console.log("Current server time zone:", moment.tz.guess());
-
-
-
 const app = express();
 const port = 8000;
 
@@ -32,15 +26,6 @@ const uri = process.env.MONGO_URI;
 
 // Connect to MongoDB
 const client = new MongoClient(uri);
-client.connect()
-    .then(() => {
-        console.log("Connected to MongoDB");
-        // Perform database operations here
-    })
-    .catch(err => {
-        console.error("Failed to connect to MongoDB", err);
-    });
-
 
 async function run() {
     try {
