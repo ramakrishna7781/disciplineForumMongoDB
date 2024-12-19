@@ -127,7 +127,8 @@ async function run() {
 
         // Schedule email sending at 10:00 AM Monday to Saturday
         //cron.schedule('0 10 * * 1-6', async () => {
-        cron.schedule('48 15 * * 1-6', async () => {
+        cron.schedule('56 15 * * 1-6', async () => {
+            console.log("Cron job triggered at 3:48 PM");
             try {
                 console.log('Running scheduled email task...');
 
@@ -149,7 +150,7 @@ async function run() {
                     service: 'gmail',
                     auth: {
                         user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS, //'dnjv ymaw xtss uhrc',
+                        pass: process.env.EMAIL_PASS,
                     },
                 });
 
