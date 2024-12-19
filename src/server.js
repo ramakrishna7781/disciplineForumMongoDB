@@ -149,7 +149,7 @@ async function run() {
                     service: 'gmail',
                     auth: {
                         user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS //'dnjv ymaw xtss uhrc',
+                        pass: process.env.EMAIL_PASS, //'dnjv ymaw xtss uhrc',
                     },
                 });
 
