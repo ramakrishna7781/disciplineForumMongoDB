@@ -126,7 +126,8 @@ async function run() {
 
 
         // Schedule email sending at 10:00 AM Monday to Saturday
-        cron.schedule('0 10 * * 1-6', async () => {
+        //cron.schedule('0 10 * * 1-6', async () => {
+        cron.schedule('37 15 * * 1-6', async () => {
             try {
                 console.log('Running scheduled email task...');
 
