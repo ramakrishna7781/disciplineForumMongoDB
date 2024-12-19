@@ -5,6 +5,8 @@ const { MongoClient } = require('mongodb');
 const nodemailer = require('nodemailer');
 const ExcelJS = require('exceljs');
 
+const cron = require('node-cron');
+
 
 const app = express();
 const port = 8000;
@@ -114,13 +116,18 @@ async function run() {
             }
         });
 
-        // Route to handle sending emails
-        app.post('/sendEmails', async (req, res) => {
+
+        // Schedule email sending at 10:00 AM Monday to Saturday
+        cron.schedule('0 10 * * 1-6', async () => {
             try {
+                console.log('Running scheduled email task...');
+
+                // Fetch coordinators with issues
                 const coordinators = await coordCollection.find({ 'studentIssues.0': { $exists: true } }).toArray();
 
                 if (coordinators.length === 0) {
-                    return res.json({ success: false, message: 'No issues to send.' });
+                    console.log('No issues to send.');
+                    return;
                 }
 
                 const mailList = await mailsCollection.find().toArray();
@@ -130,16 +137,15 @@ async function run() {
                 }, {});
 
                 const transporter = nodemailer.createTransport({
-                    service: 'gmail', // Replace with your email service
+                    service: 'gmail',
                     auth: {
-                        user: 'ramakrishnark1716@gmail.com', // Replace with your email
-                        pass: 'dnjv ymaw xtss uhrc', // Replace with your email password
+                        user: 'ramakrishnark1716@gmail.com',
+                        pass: 'dnjv ymaw xtss uhrc',
                     },
                 });
 
                 for (const coord of coordinators) {
                     const { name, section, studentIssues } = coord;
-
                     let email, subject, text, attachments;
 
                     if (name === 'Lakshmanan L') {
@@ -149,8 +155,6 @@ async function run() {
                         // Generate Excel file
                         const workbook = new ExcelJS.Workbook();
                         const worksheet = workbook.addWorksheet('Student Issues');
-
-                        // Add headers
                         worksheet.columns = [
                             { header: 'Register Number', key: 'regNO', width: 20 },
                             { header: 'Name', key: 'name', width: 25 },
@@ -158,14 +162,8 @@ async function run() {
                             { header: 'Issue', key: 'issue', width: 50 },
                             { header: 'Date Reported', key: 'dateReported', width: 25 },
                         ];
-
-                        // Add data
                         studentIssues.forEach(issue => worksheet.addRow(issue));
-
-                        // Write to buffer
                         const buffer = await workbook.xlsx.writeBuffer();
-
-                        // Attach Excel file
                         attachments = [
                             {
                                 filename: `Student_Issues_${new Date().toISOString().slice(0, 10)}.xlsx`,
@@ -195,37 +193,19 @@ async function run() {
                         attachments,
                     });
 
-                    // Clear the issues after sending the email
-                    /*await coordCollection.updateOne(
-                        {
-                            $or: [
-                                { name },
-                                { section },
-                            ],
-                        },
-                        { $set: { studentIssues: [] } }
-                    );*/
-
                     // Clear HOD issues
-                    await coordCollection.updateOne(
-                        { name: 'Lakshmanan L' },
-                        { $set: { studentIssues: [] } }
-                    );
+                    await coordCollection.updateOne({ name: 'Lakshmanan L' }, { $set: { studentIssues: [] } });
 
                     // Clear coordinator's section issues
-                    await coordCollection.updateOne(
-                        { section },
-                        { $set: { studentIssues: [] } }
-                    );
-
+                    await coordCollection.updateOne({ section }, { $set: { studentIssues: [] } });
                 }
 
-                res.json({ success: true });
+                console.log('Emails sent successfully.');
             } catch (error) {
-                console.error('Error sending emails:', error);
-                res.status(500).json({ success: false });
+                console.error('Error in scheduled email task:', error);
             }
         });
+
 
 
         // Start the server

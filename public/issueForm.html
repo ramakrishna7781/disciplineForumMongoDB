@@ -206,9 +206,6 @@
             border-radius: 8px;
         }
 
-        #close-send-email-popup:hover {
-            background-color: #c02424;
-        }
     </style>
 </head>
 <body>
@@ -223,8 +220,6 @@
             <button type="submit">Verify</button>
         </form>
         <div id="student-details"></div>
-        <!-- New Send Emails Button -->
-        <button id="send-emails" class="submit-button" onclick="sendEmails()">Send Emails</button>
     </section>
     <button id="logout-button" onclick="logout()">Logout</button>
 </main>
@@ -337,32 +332,6 @@
             });
     }
 
-    function sendEmails() {
-        fetch('/sendEmails', {
-            method: 'POST'
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('send-email-popup-message').innerText = 'Emails sent successfully!';
-                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('success');
-                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('error');
-                    document.getElementById('send-email-popup').style.display = 'block';
-                } else {
-                    document.getElementById('send-email-popup-message').innerText = 'Error sending emails!!';
-                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('error');
-                    document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('success');
-                    document.getElementById('send-email-popup').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('send-email-popup-message').innerText = 'Error sending emails!!';
-                document.getElementById('send-email-popup').querySelector('.popup-content').classList.add('error');
-                document.getElementById('send-email-popup').querySelector('.popup-content').classList.remove('success');
-                document.getElementById('send-email-popup').style.display = 'block';
-            });
-    }
 
     document.getElementById('close-popup').addEventListener('click', function() {
         document.getElementById('custom-popup').style.display = 'none';
@@ -371,10 +340,6 @@
     document.getElementById('close-success-popup').addEventListener('click', function() {
         document.getElementById('success-popup').style.display = 'none';
         window.location.reload();
-    });
-
-    document.getElementById('close-send-email-popup').addEventListener('click', function() {
-        document.getElementById('send-email-popup').style.display = 'none';
     });
 </script>
 </body>
