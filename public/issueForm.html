@@ -84,7 +84,7 @@
         }
 
         #logout-button {
-            margin-top: 1rem;
+            margin-top: -1rem;
             background-color: #9a2c2c;
             color: #fff;
             border: none;
@@ -197,15 +197,6 @@
             background-color: #c02424;
         }
 
-        #close-send-email-popup {
-            background-color: #9a2c2c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-
     </style>
 </head>
 <body>
@@ -243,13 +234,14 @@
     </div>
 </div>
 
-<!-- New Pop-up for Send Emails -->
-<div id="send-email-popup" class="popup">
-    <div class="popup-content" id="send-email-popup-content">
-        <p id="send-email-popup-message"></p>
-        <button id="close-send-email-popup">OK</button>
+<!-- Add this new pop-up for "Student Not Found" -->
+<div id="not-found-popup" class="popup">
+    <div class="popup-content error">
+        <p>Student details not found!</p>
+        <button id="close-not-found-popup">OK</button>
     </div>
 </div>
+
 
 <script>
     window.onload = function() {
@@ -296,7 +288,7 @@
                     <button type="button" class="submit-button" onclick="submitIssue()">Submit</button>
                 `;
                 } else {
-                    alert('Student not found');
+                    document.getElementById('not-found-popup').style.display = 'block';
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -341,6 +333,11 @@
         document.getElementById('success-popup').style.display = 'none';
         window.location.reload();
     });
+
+    document.getElementById('close-not-found-popup').addEventListener('click', function() {
+        document.getElementById('not-found-popup').style.display = 'none';
+    });
+
 </script>
 </body>
 </html>
