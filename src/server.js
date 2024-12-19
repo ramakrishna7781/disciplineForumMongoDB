@@ -8,6 +8,11 @@ const cron = require('node-cron');
 const moment = require("moment-timezone");
 
 
+console.log("Current server time:", moment().format('YYYY-MM-DD HH:mm:ss'));
+console.log("Current server time zone:", moment.tz.guess());
+
+
+
 const app = express();
 const port = 8000;
 
@@ -128,7 +133,7 @@ async function run() {
 
         // Schedule email sending at 10:00 AM Monday to Saturday
         //cron.schedule('0 10 * * 1-6', async () => {
-        cron.schedule('37 2 * * 1-6', async () => {
+        cron.schedule('40 2 * * 1-6', async () => {
             const currentTime = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
             console.log(`Cron job triggered at ${currentTime} IST`);
             try {
