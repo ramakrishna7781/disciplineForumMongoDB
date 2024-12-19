@@ -24,9 +24,13 @@ app.get('/', (req, res) => {
 // MongoDB connection URI
 //const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/';
 const uri = process.env.MONGO_URI;
+if (!uri) {
+    console.error("MONGO_URI is not defined!");
+    process.exit(1); // Exit if the URI is missing
+}
 
 // Connect to MongoDB
-const client = new MongoClient(uri);
+const client = new MongoClient(uri,{ useNewUrlParser: true, useUnifiedTopology: true });
 
 async function run() {
     try {
