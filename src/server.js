@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection URI
-const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/facultyLoginDB?retryWrites=true&w=majority'; // Replace this with your actual MongoDB URI
+const uri = 'mongodb+srv://ramakrishna14636:Gum2r1qtcQDfNMNL@disciplineforumdb.c6l6v.mongodb.net/'; // Replace this with your actual MongoDB URI
 
 // Connect to MongoDB
 const client = new MongoClient(uri);
