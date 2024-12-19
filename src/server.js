@@ -36,7 +36,16 @@ if (!process.env.MONGO_URI) {
 
 
 // Connect to MongoDB
-const client = new MongoClient(uri,{ useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri);
+client.connect()
+    .then(() => {
+        console.log("Connected to MongoDB");
+        // Perform database operations here
+    })
+    .catch(err => {
+        console.error("Failed to connect to MongoDB", err);
+    });
+
 
 async function run() {
     try {
