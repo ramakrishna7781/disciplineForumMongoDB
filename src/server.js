@@ -196,7 +196,7 @@ async function run() {
                     });
 
                     // Clear the issues after sending the email
-                    await coordCollection.updateOne(
+                    /*await coordCollection.updateOne(
                         {
                             $or: [
                                 { name },
@@ -204,7 +204,20 @@ async function run() {
                             ],
                         },
                         { $set: { studentIssues: [] } }
+                    );*/
+
+                    // Clear HOD issues
+                    await coordCollection.updateOne(
+                        { name: 'Lakshmanan L' },
+                        { $set: { studentIssues: [] } }
                     );
+
+                    // Clear coordinator's section issues
+                    await coordCollection.updateOne(
+                        { section },
+                        { $set: { studentIssues: [] } }
+                    );
+
                 }
 
                 res.json({ success: true });
