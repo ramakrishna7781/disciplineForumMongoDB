@@ -18,5 +18,9 @@
     "dotenv": "16.4.6",
     "node-cron": "^3.0.3",
     "moment-timezone": "^0.5.46"
-  }
+  },
+  "engines": {
+  "node": ">=18"
+}
+
 }
