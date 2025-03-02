@@ -149,7 +149,7 @@ async function run() {
                     const { name, section, studentIssues } = coord;
                     let email, subject, text, attachments;
 
-                    if (name === 'Lakshmanan L') {
+                    /*if (name === 'Lakshmanan L') {
                         subject = 'CSE Discipline Forum Sathyabama';
                         text = `Dear ${name},\n\nPlease find attached the student issues reported today.\n\nBest regards,\nCSE Discipline Forum`;
 
@@ -172,8 +172,47 @@ async function run() {
                             },
                         ];
 
-                        email = emailMap[section];
-                    } else {
+                        email = emailMap[section];*/
+                    if (name === 'Lakshmanan L') {
+                        subject = 'CSE Discipline Forum Sathyabama';
+                        text = `Dear ${name},\n\nPlease find attached the student issues reported today.\n\nBest regards,\nCSE Discipline Forum`;
+
+                        // Group student issues by section
+                        const sectionIssuesMap = {};
+                        studentIssues.forEach(issue => {
+                            if (!sectionIssuesMap[issue.section]) {
+                                sectionIssuesMap[issue.section] = [];
+                            }
+                            sectionIssuesMap[issue.section].push(issue);
+                        });
+
+                        // Create Excel files for each section
+                        attachments = [];
+                        for (const section in sectionIssuesMap) {
+                            const workbook = new ExcelJS.Workbook();
+                            const worksheet = workbook.addWorksheet(`Issues_${section}`);
+                            worksheet.columns = [
+                                { header: 'Register Number', key: 'regNO', width: 20 },
+                                { header: 'Name', key: 'name', width: 25 },
+                                { header: 'Section', key: 'section', width: 15 },
+                                { header: 'Issue', key: 'issue', width: 50 },
+                                { header: 'Date Reported', key: 'dateReported', width: 25 },
+                            ];
+
+                            // Add issues for this section
+                            sectionIssuesMap[section].forEach(issue => worksheet.addRow(issue));
+
+                            // Convert to buffer and attach
+                            const buffer = await workbook.xlsx.writeBuffer();
+                            attachments.push({
+                                filename: `Student_Issues_${section}_${new Date().toISOString().slice(0, 10)}.xlsx`,
+                                content: buffer,
+                            });
+                        }
+
+                        email = emailMap['Lakshmanan L']; // Ensure the HOD's email is set
+
+                } else {
                         subject = `CSE Discipline Forum Sathyabama\nStudent Issues for ${section}`;
                         text = `Dear ${name},\n\nThe following issues have been reported for your section:\n\n${studentIssues.map(issue => `Register Number: ${issue.regNO}\nName: ${issue.name}\nIssue: ${issue.issue}\nDate Reported: ${issue.dateReported}`).join('\n\n')}\n\nBest regards,\nCSE Discipline Forum`;
                         attachments = [];
